@@ -53,7 +53,7 @@ const filterIsWide = ref(false)
 onMounted(()=>{
   const resizeObserver = new ResizeObserver((entries) => {
     //  console.log(entries[0].target.clientWidth)
-    filterIsWide.value = ((entries[0].target.clientWidth > 310)||(entries[0].target.clientWidth === 0)) ? true : false 
+    filterIsWide.value = ((entries[0].target.clientWidth > 270)||(entries[0].target.clientWidth === 0)) ? true : false 
   })
   resizeObserver.observe(filter.value.$el);
 })
