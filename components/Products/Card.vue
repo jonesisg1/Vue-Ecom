@@ -18,13 +18,12 @@
 </template>
 
 <script setup lang="ts">
-import { useMainStore } from '~/store';
+// Stores and assets should be auto imported!
 import type { Product } from '../types';
-import { useAsset } from '#imports';
 
 const store = useMainStore()
 
-const props = defineProps<{
+defineProps<{
   cards: Product[],
   filterIsWide: boolean
 }>()
