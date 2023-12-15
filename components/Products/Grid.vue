@@ -4,30 +4,44 @@
   <!-- <div class="container-md mb-4"> -->
     <ProductsDropDownFilters class="drop-downs" @sort-item="sortItems" @toggle-filters="toggleFilters"/>
     <div class="products-with-sidebar">
-      <ProductsFilterBar ref="filter" :class="{'d-none':filtersVisible, unstick:filterIsWide}" @apply-filters="filterItems"/>
-      <div class="products">
-        <ProductsCard :cards="slicedCards" :filter-is-wide="filterIsWide" class="mb-3"/>
-        <ProductsMoreButton v-if="slicedCards.length < grid.cards.length" @increment-cards="grid.showCards += 10" :class="{'ms-3':!filterIsWide}"/>
-        <Notification v-if="slicedCards.length == 0" class="my-5 ms-3 py-5">
+      <!-- <ProductsFilterBar ref="filter" :class="{'d-none':filtersVisible, unstick:filterIsWide}" @apply-filters="filterItems"/> -->
+      <ProductsBikeFilter ref="filter" :class="{'d-none':filtersVisible, unstick:filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
+      <!-- {{ grid.bikes.length }} -->
+      <div class="products-grid-container">
+        <div class="products-grid pt-1 gap-3" :class="{'ms-3':!filterIsWide}">
+          <PrimeCard v-for="bike in slicedBikes">
+            <template #title> {{ bike.model_name }} </template>
+            <template #content>
+                <div v-for="(value, key) in bike">{{ key }} - {{ value }}</div>
+            </template>
+          </PrimeCard>
+        </div>
+        <!-- <ProductsCard :cards="slicedCards" :filter-is-wide="filterIsWide" class="mb-3"/> -->
+        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" :class="{'ms-3':!filterIsWide}"/>
+        <!-- <Notification v-if="slicedCards.length == 0" class="my-5 ms-3 py-5">
           <h4>Sorry, we can't find any products that match your filters.</h4>
-        </Notification>
+        </Notification> -->
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useMainStore } from '~/store';
-import type { Product, Filters } from '../types';
-import { reactive, onMounted, computed, ref } from '#imports';
+// Stores and composables should be auto imported!
+import type { Product, Filters, Bike, BikeFilterState } from '../types';
+
+const bikeData: Bike[] = useBikeData()
+
 interface grid {
   cards: Product[],
+  bikes: Bike[],
   showCards: number
 }
 
 const store = useMainStore()
 const grid: grid = reactive({
   cards: [],
+  bikes: bikeData,
   showCards: 10,
 })
 
@@ -36,12 +50,13 @@ const filterIsWide = ref(false)
 
 onMounted(()=>{
   const resizeObserver = new ResizeObserver((entries) => {
-    console.log(entries[0].target.clientWidth)
-    filterIsWide.value = ((entries[0].target.clientWidth > 255)||(entries[0].target.clientWidth === 0)) ? true : false 
+    //  console.log(entries[0].target.clientWidth)
+    filterIsWide.value = ((entries[0].target.clientWidth > 310)||(entries[0].target.clientWidth === 0)) ? true : false 
   })
   resizeObserver.observe(filter.value.$el);
 })
 
+const slicedBikes = computed(() => grid.bikes.slice(0, grid.showCards))
 const slicedCards = computed(() => grid.cards.slice(0, grid.showCards))
 
 const currentSort = ref('title');
@@ -56,6 +71,33 @@ const sortItems = (value: string) => {
       if (a.title > b.title) return 1
     }
     return 0
+  })
+}
+
+const doFiltering = (filterList: BikeFilterState) => {
+  console.log(filterList)
+  grid.bikes = bikeData.filter((bike: Bike) => {
+    let match = true
+    for (const filter in filterList) {
+        if (filterList[filter].length > 0) {
+            const key = filter.split(' ').join('_').toLocaleLowerCase()
+            //   console.log(bike[key])
+            if (Array.isArray(bike[key])) {
+                match = bike[key].some((r)=>{
+                    for (const key in r) {
+                        return filterList[filter].some((s)=>{
+                            return key == s;
+                        })
+                    }
+                })
+                // match = filterList[filter].some(r=> bike[key].includes(r))
+            } else {
+                match = filterList[filter].includes(bike[key])
+            }
+            if (match === false) return false
+        }
+    }
+    return match
   })
 }
 
@@ -85,10 +127,22 @@ const toggleFilters = (value: string) => {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
+  flex-basis: 300px;
 }
 
-.products {
+.products-grid-container {
     --minChildWidth: 300px;
+    flex-grow: 9999;
+    flex-basis: var(--minChildWidth);
+}
+
+.products-grid {
+    --minChildWidth: 300px;
+    display: grid;
+    grid-template-columns: 
+        repeat(auto-fit,
+        minmax(min(var(--minChildWidth),100%),
+               1fr));
     flex-grow: 9999;
     flex-basis: var(--minChildWidth);
 }
