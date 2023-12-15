@@ -3,6 +3,5 @@ export default function (path: string): string {
       eager: true,
       import: 'default',
     })
-    // @ts-expect-error: wrong type info
-    return assets['/assets/' + path]
+    return assets['/assets/' + path] as string
   }
