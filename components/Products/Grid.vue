@@ -1,6 +1,6 @@
 <template>
   <ProductsBreadCrumbs />
-  <div class="container-flow mx-5 mb-4">
+  <div class="main-div container-flow mx-5 mb-4">
   <!-- <div class="container-md mb-4"> -->
     <ProductsDropDownFilters class="drop-downs" @sort-item="sortItems" @toggle-filters="toggleFilters"/>
     <div class="products-with-sidebar">
@@ -8,16 +8,9 @@
       <ProductsBikeFilter ref="filter" :class="{'d-none':filtersVisible, unstick:filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
       <!-- {{ grid.bikes.length }} -->
       <div class="products-grid-container">
-        <div class="products-grid pt-1 gap-3" :class="{'ms-3':!filterIsWide}">
-          <PrimeCard v-for="bike in slicedBikes">
-            <template #title> {{ bike.model_name }} </template>
-            <template #content>
-                <img :src="useAsset('Procaliber8.jpg')" style="max-width: 100%">
-                <!-- <img :src="useAsset('1.jpg')" style="max-width: 300px;">  -->
-                <div v-for="(value, key) in bike">{{ key }} - {{ value }}</div>
-            </template>
-          </PrimeCard>
-        </div>
+        <!-- <div class="products-grid pt-1 gap-3 ms-3"> -->
+            <ProductsBikeCard ref="card" :bikes="slicedBikes"></ProductsBikeCard>
+        <!-- </div> -->
         <!-- <ProductsCard :cards="slicedCards" :filter-is-wide="filterIsWide" class="mb-3"/> -->
         <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" :class="{'ms-3':!filterIsWide}"/>
         <!-- <Notification v-if="slicedCards.length == 0" class="my-5 ms-3 py-5">
@@ -48,14 +41,28 @@ const grid: grid = reactive({
 })
 
 const filter = ref()
-const filterIsWide = ref(false)
+const card = ref() 
+// const filterIsWide = ref(false)
+const filterRight = ref(0)
+const cardLeft = ref(0)
+const filterIsWide = computed(() => cardLeft.value < filterRight.value)
 
 onMounted(()=>{
-  const resizeObserver = new ResizeObserver((entries) => {
+  const filterResizeObserver = new ResizeObserver((entries) => {
+    // console.log(`Right ${entries[0].target.getBoundingClientRect().right}`)
     //  console.log(entries[0].target.clientWidth)
-    filterIsWide.value = ((entries[0].target.clientWidth > 270)||(entries[0].target.clientWidth === 0)) ? true : false 
+    // filterIsWide.value = ((entries[0].target.clientWidth > 302)||(entries[0].target.clientWidth === 0)) ? true : false
+    filterRight.value = entries[0].target.getBoundingClientRect().right
+    // filterIsWide.value = cardLeft.value < filterRight.value
   })
-  resizeObserver.observe(filter.value.$el);
+  filterResizeObserver.observe(filter.value.$el);
+  const cardResizeObserver = new ResizeObserver((entries) => {
+    // console.log(`Left ${entries[0].target.getBoundingClientRect().left}`)
+    //  console.log(entries[0].target.clientWidth)
+    // filterIsWide.value = ((entries[0].target.clientWidth > 302)||(entries[0].target.clientWidth === 0)) ? true : false
+    cardLeft.value = entries[0].target.getBoundingClientRect().left
+  })
+  cardResizeObserver.observe(card.value.$el);
 })
 
 const slicedBikes = computed(() => grid.bikes.slice(0, grid.showCards))
@@ -129,7 +136,7 @@ const toggleFilters = (value: string) => {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  flex-basis: 300px;
+  flex-basis: 350px;
 }
 
 .products-grid-container {
@@ -138,19 +145,18 @@ const toggleFilters = (value: string) => {
     flex-basis: var(--minChildWidth);
 }
 
-.products-grid {
-    --minChildWidth: 300px;
-    display: grid;
-    grid-template-columns: 
-        repeat(auto-fit,
-        minmax(min(var(--minChildWidth),100%),
-               1fr));
-    flex-grow: 9999;
-    flex-basis: var(--minChildWidth);
-}
-
 .unstick {
   position: static !important;
+}
+
+@media (max-width: 768px ) {
+    .products-grid {
+        margin-left: 0 !important;
+    }
+    .main-div {
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+    }
 }
 
 </style>

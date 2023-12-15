@@ -24,7 +24,7 @@
             <h5>{{props.filterHeader}}</h5>
         </template>
         <div class="d-flex flex-wrap justify-content-start gap-2">
-            <div v-for="(item, index) in props.filterOptions" style="min-width:max-content;">
+            <div v-for="(item, index) in props.filterOptions"  class="d-flex">
                 <PrimeCheckbox v-model="selection" :inputId="`${item}${index}`" :name="(item.toString())" :value="item" />
                 <label :for="`${item}${index}`" class="mx-2"> {{ item }} </label>
             </div>

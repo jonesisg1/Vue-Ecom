@@ -26,7 +26,7 @@ import type { BikeFilterSelection, BikeFilterState } from '../types';
 
 <style scoped>
 .filter-container {
-  flex-basis: 250px;
+  flex-basis: 300px;
   flex-grow: 1;
   position: sticky;
   top: 125px;
