@@ -32,7 +32,7 @@ export default defineNuxtConfig({
   primevue: {
     components: {
         prefix: 'Prime',
-        include: ['Slider', 'Panel']    /* Used as <PrimeSlider> ... /> */
+        include: ['Slider', 'Panel', 'Checkbox', 'Card']    /* Used as <PrimeSlider> ... /> */
     }
   },
   css: [
