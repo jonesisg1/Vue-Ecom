@@ -12,6 +12,8 @@
           <PrimeCard v-for="bike in slicedBikes">
             <template #title> {{ bike.model_name }} </template>
             <template #content>
+                <img :src="useAsset('Procaliber8.jpg')" style="max-width: 100%">
+                <!-- <img :src="useAsset('1.jpg')" style="max-width: 300px;">  -->
                 <div v-for="(value, key) in bike">{{ key }} - {{ value }}</div>
             </template>
           </PrimeCard>
