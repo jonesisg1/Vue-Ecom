@@ -8,6 +8,7 @@ export interface Product {
   }
 
 export interface State {
+    filtersVisible: boolean,
     productInfo: Product,
     cartItems: Product[],
     items: Product[],
@@ -24,8 +25,7 @@ export interface BikeSizeData {
   [key: string] : string[]
 }
 
-type ForkTravelOptions = Record<string, string[]>;
-type WheelSizesOptions = Record<string, string[]>;
+export type SizesOptions = Record<string, string[]>;
 
 export interface Bike {
   brand: string;
@@ -35,8 +35,8 @@ export interface Bike {
   created_at: string;
   model_name: string;
   model_year: number | null;
-  fork_travel: ForkTravelOptions[];
-  wheel_sizes: WheelSizesOptions[];
+  fork_travel: SizesOptions[];
+  wheel_sizes: SizesOptions[];
   bike_alt_ref: string;
   model_family: string;
   frame_material: string;

@@ -14,11 +14,25 @@ import type { BikeFilterSelection, BikeFilterState } from '../types';
     }
     
     // ToDo router.push({ query: newFilterQuery })
+
+    const store = useMainStore()
+    store.$subscribe((mutation, state) => {
+        // console.log(mutation)
+        console.log(`${state.filtersVisible}`)
+        if(state.filtersVisible === true) {
+            // panel.value[0].$el.scrollIntoView()
+        }
+    })
+
+    const panel = ref()
+    onMounted(() => {
+        // console.log(panel.value[1].$el)
+    })
 </script>
 
 <template>
   <div class="filter-container pt-1">
-    <ProductsBikeFilterPanel v-for="(value, key) in filterData" 
+    <ProductsBikeFilterPanel ref="panel" v-for="(value, key) in filterData" 
       :filter-header="key" :filter-options="value" @filter-changed="filterItems">
     </ProductsBikeFilterPanel>
   </div>

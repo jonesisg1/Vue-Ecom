@@ -3,6 +3,12 @@
         <button class="btn btn-light" role="button" @click="toggleFilters">
             <span style="color:#f2be00;">{{ (filtersVisible === 'SHOWN')?'HIDE FILTERS' :'SHOW FILTERS' }}</span>
         </button>
+        <PrimeScrollTop icon="pi pi-arrow-up" behavior="auto" :pt="{
+            root: 'rounded-circle',
+            icon: {
+                class: 'text-base'
+            }
+        }"/>
         <div class="dropdown">
             <a class="btn btn-light dropdown-toggle" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">SORT BY

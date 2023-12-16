@@ -1,21 +1,16 @@
 <template>
   <ProductsBreadCrumbs />
   <div class="main-div container-flow mx-5 mb-4">
-  <!-- <div class="container-md mb-4"> -->
-    <ProductsDropDownFilters class="drop-downs" @sort-item="sortItems" @toggle-filters="toggleFilters"/>
+    <ProductsDropDownFilters class="drop-downs" :class="{unstick:(store.filtersVisible) ? filterIsWide : true}"  @sort-item="sortItems" @toggle-filters="toggleFilters"/>
     <div class="products-with-sidebar">
-      <!-- <ProductsFilterBar ref="filter" :class="{'d-none':filtersVisible, unstick:filterIsWide}" @apply-filters="filterItems"/> -->
-      <ProductsBikeFilter ref="filter" :class="{'d-none':filtersVisible, unstick:filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
+      <ProductsBikeFilter ref="filter" :class="{'d-none':!store.filtersVisible, unstick:filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
       <!-- {{ grid.bikes.length }} -->
       <div class="products-grid-container">
-        <!-- <div class="products-grid pt-1 gap-3 ms-3"> -->
-            <ProductsBikeCard ref="card" :bikes="slicedBikes"></ProductsBikeCard>
-        <!-- </div> -->
-        <!-- <ProductsCard :cards="slicedCards" :filter-is-wide="filterIsWide" class="mb-3"/> -->
-        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" :class="{'ms-3':!filterIsWide}"/>
-        <!-- <Notification v-if="slicedCards.length == 0" class="my-5 ms-3 py-5">
+        <ProductsBikeCard ref="card" :class="{'ms-3':(store.filtersVisible) ? !filterIsWide : false}" :bikes="slicedBikes"></ProductsBikeCard>
+        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" class="mt-3" :class="{'ms-3':(store.filtersVisible) ? !filterIsWide : false}"/>
+        <Notification v-if="slicedBikes.length == 0" class="my-5 ms-3 py-5">
           <h4>Sorry, we can't find any products that match your filters.</h4>
-        </Notification> -->
+        </Notification>
       </div>
     </div>
   </div>
@@ -42,31 +37,22 @@ const grid: grid = reactive({
 
 const filter = ref()
 const card = ref() 
-// const filterIsWide = ref(false)
 const filterRight = ref(0)
 const cardLeft = ref(0)
-const filterIsWide = computed(() => cardLeft.value < filterRight.value)
+const filterIsWide = computed(() => (filterRight.value === 0) ? false : cardLeft.value < filterRight.value)
 
 onMounted(()=>{
   const filterResizeObserver = new ResizeObserver((entries) => {
-    // console.log(`Right ${entries[0].target.getBoundingClientRect().right}`)
-    //  console.log(entries[0].target.clientWidth)
-    // filterIsWide.value = ((entries[0].target.clientWidth > 302)||(entries[0].target.clientWidth === 0)) ? true : false
     filterRight.value = entries[0].target.getBoundingClientRect().right
-    // filterIsWide.value = cardLeft.value < filterRight.value
   })
   filterResizeObserver.observe(filter.value.$el);
   const cardResizeObserver = new ResizeObserver((entries) => {
-    // console.log(`Left ${entries[0].target.getBoundingClientRect().left}`)
-    //  console.log(entries[0].target.clientWidth)
-    // filterIsWide.value = ((entries[0].target.clientWidth > 302)||(entries[0].target.clientWidth === 0)) ? true : false
     cardLeft.value = entries[0].target.getBoundingClientRect().left
   })
   cardResizeObserver.observe(card.value.$el);
 })
 
 const slicedBikes = computed(() => grid.bikes.slice(0, grid.showCards))
-const slicedCards = computed(() => grid.cards.slice(0, grid.showCards))
 
 const currentSort = ref('title');
 const sortItems = (value: string) => {
@@ -123,9 +109,11 @@ const filterItems = (filterList: Filters) => {
   sortItems(currentSort.value)
 }
 
-const filtersVisible = ref(false)
-const toggleFilters = (value: string) => {
-  filtersVisible.value = (value === 'HIDDEN') ? true : false
+// const filtersVisible = ref(false)
+
+const toggleFilters = () => {
+    (store.filtersVisible === true) ? store.hideFilter() : store.showFilter()
+    // filter.value.$el.scrollIntoView()
 }
 
 </script>
