@@ -8,6 +8,10 @@ const emit = defineEmits<{
     (e: 'filtersChanged', filters: BikeFilterState): void,
 }>()
 
+const min:number = 0
+const max:number = 20000
+const priceFilters = ref<number[]>([min, max])
+
 let filterState: BikeFilterState = {}
 
 // Init selections
@@ -28,6 +32,7 @@ for (const filterType in route.query) {
             filterState[filterType] = [Number.parseFloat(filterOrFilterArray)] as number[]
         }
     }
+    priceFilters.value = filterState['Price'] as number[]
 }
 
 onMounted(() => emit('filtersChanged', filterState))
@@ -37,14 +42,44 @@ const filterItems = (filterList: BikeFilterSelection) => {
     emit('filtersChanged', filterState)
     router.push({ query: filterState })
 }
+
+const filterOnPrice = () => {
+    if (priceFilters.value[0] === min && priceFilters.value[1] === max) {
+        filterState['Price'] = []
+    } else {
+        filterState['Price'] = priceFilters.value
+    }
+    emit('filtersChanged', filterState)
+    router.push({ query: filterState })
+}
+
+const resetPriceFilters = () => {
+    priceFilters.value = [min,max]
+    filterOnPrice()
+}
 </script>
 
 <template>
-  <div class="filter-container pt-1">
-    <ProductsBikeFilterPanel  v-for="(value, key) in filterData" 
-        :filter-header="key" :filter-options="value" @filter-changed="filterItems">
-    </ProductsBikeFilterPanel>
-  </div>
+    <div class="filter-container pt-1">
+        <PrimePanel toggleable class="pb-2">
+            <template #header>
+                <h5>Price</h5>
+            </template>
+            <div class="d-flex justify-content-between mb-2">
+                <label>£{{ priceFilters[0] }}</label>
+                <label>£{{ priceFilters[1] }}</label>
+            </div>
+            <PrimeSlider v-model="priceFilters" range :min=min :max=max @slideend="filterOnPrice" />
+            <template #icons>
+                <button class="p-panel-header-icon p-link mr-2" @click="resetPriceFilters" :class="{'d-none':priceFilters[0]=== min && priceFilters[1] === max}">
+                    <span class="pi pi-filter-slash"></span>
+                </button>
+            </template>
+        </PrimePanel>    
+        <ProductsBikeFilterPanel  v-for="(value, key) in filterData" 
+            :filter-header="key" :filter-options="value" @filter-changed="filterItems">
+        </ProductsBikeFilterPanel>
+    </div>
 </template>
 
 <style scoped>

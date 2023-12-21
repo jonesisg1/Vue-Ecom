@@ -77,35 +77,42 @@ const doFiltering = (filterList: BikeFilterState) => {
     let match = true
     for (const filter in filterList) {
         if (filterList[filter].length > 0) {
-            const key = filter.split(' ').join('_').toLocaleLowerCase() as keyof Bike
-            //   console.log(bike[key])
-            if (Array.isArray(bike[key])) {
-                const bikePropArray = bike[key] as string[] | number[] | SizesOptions[]
-                if (typeof bikePropArray[0] === 'object') { // Handle Rear / Fork travel and Wheel size format
-                    match = bikePropArray.some((r)=>{
-                        for (const key in r as any) {
-                            return filterList[filter].some((s)=>{
-                                return key == s;
-                            })
-                        }
-                    })
-                } else {
-                    match = bikePropArray.some((r)=>{ // Handle Sizes in stock
-                        const sizesInStock: string[] = filterList[filter] as string[]
-                        return sizesInStock.includes(r as string)
-                    })
-                }
+            // Price filtering is different!
+            if (filter === 'Price') {
+                const minPrice = filterList[filter][0] as number
+                const maxPrice = filterList[filter][1] as number
+                match = (bike.best_price >= (minPrice*100) && bike.best_price <= (maxPrice*100))
             } else {
-                // ToDo fix typescript @ts-ignore
-                // match = filterList[filter].includes((typeof bike[key] == 'number') ? Number.parseFloat(bike[key]): bike[key])
-                // This is a fix but I'd rather it be less wordy!
-                const bikeProp = bike[key] as string
-                if ( typeof bikeProp === 'number') {
-                    const filterSelectionOfNumbers = filterList[filter] as number[] 
-                    match = filterSelectionOfNumbers.includes(Number.parseFloat(bikeProp))                    
+                const key = filter.split(' ').join('_').toLocaleLowerCase() as keyof Bike
+                //   console.log(bike[key])
+                if (Array.isArray(bike[key])) {
+                    const bikePropArray = bike[key] as string[] | number[] | SizesOptions[]
+                    if (typeof bikePropArray[0] === 'object') { // Handle Rear / Fork travel and Wheel size format
+                        match = bikePropArray.some((r)=>{
+                            for (const key in r as any) {
+                                return filterList[filter].some((s)=>{
+                                    return key == s;
+                                })
+                            }
+                        })
+                    } else {
+                        match = bikePropArray.some((r)=>{ // Handle Sizes in stock
+                            const sizesInStock: string[] = filterList[filter] as string[]
+                            return sizesInStock.includes(r as string)
+                        })
+                    }
                 } else {
-                    const filterSelectionOfStrings = filterList[filter] as string[] 
-                    match = filterSelectionOfStrings.includes(bikeProp)
+                    // ToDo fix typescript @ts-ignore
+                    // match = filterList[filter].includes((typeof bike[key] == 'number') ? Number.parseFloat(bike[key]): bike[key])
+                    // This is a fix but I'd rather it be less wordy!
+                    const bikeProp = bike[key] as string
+                    if ( typeof bikeProp === 'number') {
+                        const filterSelectionOfNumbers = filterList[filter] as number[] 
+                        match = filterSelectionOfNumbers.includes(Number.parseFloat(bikeProp))                    
+                    } else {
+                        const filterSelectionOfStrings = filterList[filter] as string[] 
+                        match = filterSelectionOfStrings.includes(bikeProp)
+                    }
                 }
             }
             if (match === false) return false
@@ -113,22 +120,8 @@ const doFiltering = (filterList: BikeFilterState) => {
     }
     return match
   })
-}
-
-const filterItems = (filterList: Filters) => {
-   grid.cards = store.items.filter((card) => {
-    return  (
-      (filterList.types.includes(card.type||'') || filterList.types.length === 0) &&
-      (filterList.colors.includes(card.color||'') || filterList.colors.length === 0) &&
-      (((card.price || 0) > filterList.minPrice) && ((card.price || 0) < filterList.maxPrice))
-    )
-  })
-
   grid.showCards = 10
-  sortItems(currentSort.value)
 }
-
-// const filtersVisible = ref(false)
 
 const toggleFilters = () => {
     (store.filtersVisible === true) ? store.hideFilter() : store.showFilter()
