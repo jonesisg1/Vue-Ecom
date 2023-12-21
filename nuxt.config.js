@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   imports: {
     dirs: ["store"],
   },
-  modules: ["@nuxt/devtools", "@pinia/nuxt", 'nuxt-primevue'],
+  modules: ["@nuxt/devtools", "@pinia/nuxt", 'nuxt-primevue', '@nuxt/image',],
   extends: ["nuxt-seo-kit"],
   routeRules: {
     "/**": { robots: "index, follow" },

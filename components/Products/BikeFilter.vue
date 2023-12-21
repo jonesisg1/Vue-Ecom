@@ -1,19 +1,42 @@
 <script lang="ts" setup>
 import type { BikeFilterSelection, BikeFilterState } from '../types';
 
-    const emit = defineEmits<{
-        (e: 'filtersChanged', filters: BikeFilterState): void,
-    }>()
+const router = useRouter()
+const filterData = useBikeFilterData() // Filter definitions from database.
 
-    const filterData = useBikeFilterData()
-    let filterState: BikeFilterState = {}
-    const filterItems = (filterList: BikeFilterSelection) => {
-        filterState[filterList.header] = filterList.selection
-        emit('filtersChanged', filterState)
+const emit = defineEmits<{
+    (e: 'filtersChanged', filters: BikeFilterState): void,
+}>()
+
+let filterState: BikeFilterState = {}
+
+// Init selections
+// ToDo - move this logic to the grid so we can sort off the bat and pass in the filter state.
+const route = useRoute()
+for (const filterType in route.query) {
+    const filterOrFilterArray: string | string[] = route.query[filterType] as string
+    if (Array.isArray(filterOrFilterArray)) {
+        if (Number.isNaN(Number.parseFloat(filterOrFilterArray[0]))) {
+            filterState[filterType] = filterOrFilterArray as string[]
+        } else {
+            filterState[filterType] = filterOrFilterArray.map(si => Number.parseFloat(si))
+        }
+    } else {
+        if (Number.isNaN(Number.parseFloat(filterOrFilterArray[0]))) {
+            filterState[filterType] = [filterOrFilterArray] as string[]
+        } else {
+            filterState[filterType] = [Number.parseFloat(filterOrFilterArray)] as number[]
+        }
     }
-    
-    // ToDo router.push({ query: newFilterQuery })
+}
 
+onMounted(() => emit('filtersChanged', filterState))
+
+const filterItems = (filterList: BikeFilterSelection) => {
+    filterState[filterList.header] = filterList.selection
+    emit('filtersChanged', filterState)
+    router.push({ query: filterState })
+}
 </script>
 
 <template>

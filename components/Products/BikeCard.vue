@@ -2,7 +2,8 @@
     <div class="products-grid pt-1 gap-3">
     <PrimeCard v-for="bike in bikes">
         <template #title>
-            <img :src="useAsset('Procaliber8.jpg')" style="max-width: 100%">
+            <!-- <img :src="useAsset('Procaliber8.jpg')" style="max-width: 100%"> -->
+            <NuxtImg :src="`${bike.brand.toLocaleLowerCase()}/${bike.img_src}.webp`" style="max-width: 100%"/>
         </template>
         <template #content>
             <h3>{{ bike.model_name }} </h3>
@@ -11,7 +12,8 @@
                     <strong>{{ titleCase(key) }}</strong> - {{ (Array.isArray(value)) ? prettyFyArray(value) : value }} 
                 </span>
             </div>
-            <div class="pt-3"><strong>£ {{ bike.price/100 }}</strong></div>
+            <div v-if="bike.book_price_from === bike.best_price" class="pt-3"><strong>£{{ bike.book_price_from/100 }}</strong></div>
+            <div v-else class="pt-3"><strong><s>£{{ bike.book_price_from }} </s> <span class="sale">Sale £{{bike.best_price/100 }}</span></strong></div>
         </template>
     </PrimeCard>
     </div>
@@ -25,16 +27,20 @@ defineProps<{
   bikes: Bike[]
 }>()
 
-const show = ['brand', 'frame_material', 'wheel_size', 'fork_travel' ]
+const show = ['brand', 'frame_material', 'wheel_size', 'rear_travel', 'fork_travel', 'sizes_in_stock' ]
 const initCaps = (string: string) => string[0].toUpperCase() + string.slice(1).toLowerCase()
 const titleCase = ( label: string ) => {
     return label.split('_').map((w)=>initCaps(w)).join(' ')
 }
-const prettyFyArray = (sizeOptiops: SizesOptions[]) => {
+const prettyFyArray = (sizeOptiops: SizesOptions[]|string[]) => {
     let arrayStr = ''
     for (const size of sizeOptiops) {
+        if (typeof size === 'object') {
             for (const [key, value] of Object.entries(size)) {
                 arrayStr += (value[0] === '*') ? ` ${key}` : `, ${key}: (${value})`
+            }
+        } else { // For sizes in stock
+            arrayStr += `, ${size}`
         }
     }
     return arrayStr.slice(1)
@@ -52,5 +58,9 @@ const prettyFyArray = (sizeOptiops: SizesOptions[]) => {
                1fr));
     flex-grow: 9999;
     flex-basis: var(--minChildWidth);
+}
+
+.sale {
+    color: #FF0000;
 }
 </style>

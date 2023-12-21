@@ -10,7 +10,18 @@
         (e: 'filterChanged', filters: BikeFilterSelection): void,
     }>()
 
-    const selection = ref<string[]>([])
+    const selection = ref<string[]|number[]>([])
+    
+    // Init selections
+    const route = useRoute()
+    const selectedItemOrItems = route.query[props.filterHeader] as string | string[] | undefined
+    if (selectedItemOrItems != null) {
+        if (Array.isArray(selectedItemOrItems)) {
+            selection.value = (Number.isNaN(Number.parseFloat(selectedItemOrItems[0]))) ? selectedItemOrItems : selectedItemOrItems.map(item => Number.parseFloat(item))
+        } else {
+            selection.value = ((Number.isNaN(Number.parseFloat(selectedItemOrItems))) ? [selectedItemOrItems] : [Number.parseFloat(selectedItemOrItems)])
+        }
+    }    
 
     watch([selection], () => emitSelection())
 

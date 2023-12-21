@@ -40,13 +40,18 @@ export interface Bike {
   bike_alt_ref: string;
   model_family: string;
   frame_material: string;
+  sizes_in_stock: string[];
+  book_price_from: number;
+  book_price_to?: number
+  best_price: number;
+  img_src: string;
 };
 
 export interface BikeFilterSelection {
   header: string,
-  selection: string[]
+  selection: string[]|number[]
 }
 
 export interface BikeFilterState {
-  [key: string]: string[];
+  [key: string]: string[]|number[];
 };

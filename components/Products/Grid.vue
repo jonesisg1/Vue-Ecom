@@ -3,8 +3,8 @@
   <div class="main-div container-flow mx-5 mb-4">
     <ProductsDropDownFilters class="drop-downs" :class="{unstick:(store.filtersVisible) ? filterIsWide : true}"  @sort-item="sortItems" @toggle-filters="toggleFilters"/>
     <div class="products-with-sidebar">
-      <ProductsBikeFilter ref="filter" :class="{'d-none':!store.filtersVisible, unstick:filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
-      <!-- {{ grid.bikes.length }} -->
+      <ProductsBikeFilter ref="filter" :class="{'d-none':!store.filtersVisible, unstick:filterIsWide, 'side-bar':!filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
+      <!-- {{ grid.bikes }} -->
       <div class="products-grid-container">
         <ProductsBikeCard ref="card" :class="{'ms-3':(store.filtersVisible) ? !filterIsWide : false}" :bikes="slicedBikes"></ProductsBikeCard>
         <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" class="mt-3" :class="{'ms-3':(store.filtersVisible) ? !filterIsWide : false}"/>
@@ -18,9 +18,11 @@
 
 <script setup lang="ts">
 // Stores and composables should be auto imported!
-import type { Product, Filters, Bike, BikeFilterState } from '../types';
+import type { Product, Filters, Bike, BikeFilterState, SizesOptions } from '../types';
 
 const bikeData: Bike[] = useBikeData()
+
+// console.log(bikeData)
 
 interface grid {
   cards: Product[],
@@ -57,13 +59,13 @@ const slicedBikes = computed(() => grid.bikes.slice(0, grid.showCards))
 const currentSort = ref('title');
 const sortItems = (value: string) => {
   currentSort.value = value
-  grid.cards.sort((a, b) => {
-    if (value === 'newest') return (a.title === undefined || b.title === undefined) ? 0 : (a.title.length  * 2) - (b.title.length * 4)
-    if (value === 'price') return (a.price === undefined || b.price === undefined) ? 0 :(a.price - b.price)
+  grid.bikes.sort((a, b) => {
+    // if (value === 'newest') return (a.title === undefined || b.title === undefined) ? 0 : (a.title.length  * 2) - (b.title.length * 4)
+    if (value === 'price') return (a.book_price_from === undefined || b.book_price_from === undefined) ? 0 :(a.book_price_from - b.book_price_from)
     if (value === 'title') {
-      if (a.title === undefined || b.title === undefined) return 0
-      if (a.title < b.title) return -1
-      if (a.title > b.title) return 1
+      // if (a.title === undefined || b.title === undefined) return 0
+      // if (a.title < b.title) return -1
+      // if (a.title > b.title) return 1
     }
     return 0
   })
@@ -75,19 +77,36 @@ const doFiltering = (filterList: BikeFilterState) => {
     let match = true
     for (const filter in filterList) {
         if (filterList[filter].length > 0) {
-            const key = filter.split(' ').join('_').toLocaleLowerCase()
+            const key = filter.split(' ').join('_').toLocaleLowerCase() as keyof Bike
             //   console.log(bike[key])
             if (Array.isArray(bike[key])) {
-                match = bike[key].some((r)=>{
-                    for (const key in r) {
-                        return filterList[filter].some((s)=>{
-                            return key == s;
-                        })
-                    }
-                })
-                // match = filterList[filter].some(r=> bike[key].includes(r))
+                const bikePropArray = bike[key] as string[] | number[] | SizesOptions[]
+                if (typeof bikePropArray[0] === 'object') { // Handle Rear / Fork travel and Wheel size format
+                    match = bikePropArray.some((r)=>{
+                        for (const key in r as any) {
+                            return filterList[filter].some((s)=>{
+                                return key == s;
+                            })
+                        }
+                    })
+                } else {
+                    match = bikePropArray.some((r)=>{ // Handle Sizes in stock
+                        const sizesInStock: string[] = filterList[filter] as string[]
+                        return sizesInStock.includes(r as string)
+                    })
+                }
             } else {
-                match = filterList[filter].includes(bike[key])
+                // ToDo fix typescript @ts-ignore
+                // match = filterList[filter].includes((typeof bike[key] == 'number') ? Number.parseFloat(bike[key]): bike[key])
+                // This is a fix but I'd rather it be less wordy!
+                const bikeProp = bike[key] as string
+                if ( typeof bikeProp === 'number') {
+                    const filterSelectionOfNumbers = filterList[filter] as number[] 
+                    match = filterSelectionOfNumbers.includes(Number.parseFloat(bikeProp))                    
+                } else {
+                    const filterSelectionOfStrings = filterList[filter] as string[] 
+                    match = filterSelectionOfStrings.includes(bikeProp)
+                }
             }
             if (match === false) return false
         }
@@ -125,6 +144,11 @@ const toggleFilters = () => {
   align-items: flex-start;
   flex-wrap: wrap;
   flex-basis: 350px;
+}
+
+.side-bar {
+    max-height: calc(100vh - 125px);
+    overflow-y: auto;
 }
 
 .products-grid-container {
