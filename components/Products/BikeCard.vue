@@ -3,12 +3,12 @@
     <PrimeCard v-for="bike in bikes">
         <template #title>
             <!-- <img :src="useAsset('Procaliber8.jpg')" style="max-width: 100%"> -->
-            <NuxtImg :src="`${bike.brand.toLocaleLowerCase()}/${bike.img_src}.webp`" style="max-width: 100%"/>
+            <NuxtImg :src="`${bike.brand.toLocaleLowerCase()}/${bike.img_src}.webp`" style="width: clamp(10%, 100%, 100%)"/>
         </template>
         <template #content>
             <h3>{{ bike.model_name }} </h3>
             <div v-for="(value, key) in bike">
-                <span v-if="show.includes(key)">
+                <span v-if="show.includes(key) && value">
                     <strong>{{ titleCase(key) }}</strong> - {{ (Array.isArray(value)) ? prettyFyArray(value) : value }} 
                 </span>
             </div>

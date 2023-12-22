@@ -1,13 +1,13 @@
 <template>
   <ProductsBreadCrumbs />
   <div class="main-div container-flow mx-5 mb-4">
-    <ProductsDropDownFilters class="drop-downs" :class="{unstick:(store.filtersVisible) ? filterIsWide : true}"  @sort-item="sortItems" @toggle-filters="toggleFilters"/>
+    <ProductsDropDownFilters class="drop-downs mx-2" :class="{unstick:(store.filtersVisible) ? filterIsWide : true}"  @sort-item="sortItems" @toggle-filters="toggleFilters"/>
     <div class="products-with-sidebar">
-      <ProductsBikeFilter ref="filter" :class="{'d-none':!store.filtersVisible, unstick:filterIsWide, 'side-bar':!filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
+      <ProductsBikeFilter ref="filter" class="mx-2" :class="{'d-none':!store.filtersVisible, unstick:filterIsWide, 'side-bar':!filterIsWide}" @filters-Changed="doFiltering"></ProductsBikeFilter>
       <!-- {{ grid.bikes }} -->
       <div class="products-grid-container">
-        <ProductsBikeCard ref="card" :class="{'ms-3':(store.filtersVisible) ? !filterIsWide : false}" :bikes="slicedBikes"></ProductsBikeCard>
-        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" class="mt-3" :class="{'ms-3':(store.filtersVisible) ? !filterIsWide : false}"/>
+        <ProductsBikeCard ref="card" class="mx-2" :bikes="slicedBikes"></ProductsBikeCard>
+        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" class="mt-3 mx-2" />
         <Notification v-if="slicedBikes.length == 0" class="my-5 ms-3 py-5">
           <h4>Sorry, we can't find any products that match your filters.</h4>
         </Notification>
@@ -61,11 +61,17 @@ const sortItems = (value: string) => {
   currentSort.value = value
   grid.bikes.sort((a, b) => {
     // if (value === 'newest') return (a.title === undefined || b.title === undefined) ? 0 : (a.title.length  * 2) - (b.title.length * 4)
-    if (value === 'price') return (a.book_price_from === undefined || b.book_price_from === undefined) ? 0 :(a.book_price_from - b.book_price_from)
-    if (value === 'title') {
-      // if (a.title === undefined || b.title === undefined) return 0
-      // if (a.title < b.title) return -1
-      // if (a.title > b.title) return 1
+    if (value === 'price-lh') return (a.book_price_from === undefined || b.book_price_from === undefined) ? 0 :(a.book_price_from - b.book_price_from)
+    if (value === 'price-hl') return (b.book_price_from === undefined || a.book_price_from === undefined) ? 0 :(b.book_price_from - a.book_price_from)
+    if (value === 'model-az') {
+      if (a.model_name === undefined || b.model_name === undefined) return 0
+      if (a.model_name < b.model_name) return -1
+      if (a.model_name > b.model_name) return 1
+    }
+    if (value === 'model-za') {
+      if (b.model_name === undefined || a.model_name === undefined) return 0
+      if (b.model_name < a.model_name) return -1
+      if (b.model_name > a.model_name) return 1
     }
     return 0
   })
@@ -121,6 +127,7 @@ const doFiltering = (filterList: BikeFilterState) => {
     return match
   })
   grid.showCards = 10
+  sortItems(currentSort.value)
 }
 
 const toggleFilters = () => {
@@ -155,12 +162,12 @@ const toggleFilters = () => {
 }
 
 @media (max-width: 768px ) {
-    .products-grid {
+    /* .products-grid {
         margin-left: 0 !important;
-    }
+    } */
     .main-div {
-        margin-left: 1rem !important;
-        margin-right: 1rem !important;
+        margin-left: 0.25rem !important;
+        margin-right: 0.25rem !important;
     }
 }
 

@@ -9,7 +9,7 @@ const emit = defineEmits<{
 }>()
 
 const min:number = 0
-const max:number = 20000
+const max:number = 15000
 const priceFilters = ref<number[]>([min, max])
 
 let filterState: BikeFilterState = {}
