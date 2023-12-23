@@ -9,7 +9,7 @@
             <h3>{{ bike.model_name }} </h3>
             <div v-for="(value, key) in bike">
                 <span v-if="show.includes(key) && value">
-                    <strong>{{ titleCase(key) }}</strong> - {{ (Array.isArray(value)) ? prettyFyArray(value) : value }} 
+                    <strong>{{ titleCase(key) }}</strong> - {{ (Array.isArray(value)) ? prettyFiArray(value) : value }} 
                 </span>
             </div>
             <div v-if="bike.book_price_from === bike.best_price" class="pt-3"><strong>£{{ bike.book_price_from/100 }}</strong></div>
@@ -32,15 +32,19 @@ const initCaps = (string: string) => string[0].toUpperCase() + string.slice(1).t
 const titleCase = ( label: string ) => {
     return label.split('_').map((w)=>initCaps(w)).join(' ')
 }
-const prettyFyArray = (sizeOptiops: SizesOptions[]|string[]) => {
+const prettyFiArray = (sizeOptiops: SizesOptions[]|string[]) => {
     let arrayStr = ''
-    for (const size of sizeOptiops) {
-        if (typeof size === 'object') {
-            for (const [key, value] of Object.entries(size)) {
-                arrayStr += (value[0] === '*') ? ` ${key}` : `, ${key}: (${value})`
+    if (sizeOptiops.length === 1) {
+        arrayStr = ' ' + Object.keys(sizeOptiops[0])[0]
+    } else {
+        for (const size of sizeOptiops) {
+            if (typeof size === 'object') {
+                for (const [key, value] of Object.entries(size)) {
+                    arrayStr += (value[0] === '*') ? ` ${key}` : `, ${key}: (${value})`
+                }
+            } else { // For sizes in stock
+                arrayStr += `, ${size}`
             }
-        } else { // For sizes in stock
-            arrayStr += `, ${size}`
         }
     }
     return arrayStr.slice(1)
