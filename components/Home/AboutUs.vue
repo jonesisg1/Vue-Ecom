@@ -12,9 +12,7 @@
       </div>
     </div>
     <div class="row p-4">
-      <div
-        class="col-12 col-sm-6 text-sm-right text-md-right ml-sm-0 ml-md-5 ml-lg-5 ml-xl-5 text-lg-right order-sm-first order-12"
-        style="margin-right: -8%; z-index:1;">
+      <div class="col-12 col-sm-6 ">
         <h2>Workshop Facilities</h2>
         <p>Nulla porta facilisis scelerisque. Nam nec mattis dolor, in placerat lectus. Donec lobortis fringilla neque nec feugiat. Aenean ac erat neque. Vivamus vestibulum nec risus nec fringilla. Nulla facilisi. Sed sed ante a sapien elementum vulputate. Nulla dictum velit sit amet mi eleifend fringilla. Nam vestibulum ipsum sit amet sapien pretium, et pharetra dui venenatis. Donec sed eleifend sapien.
         </p>
@@ -28,7 +26,7 @@
 
 <style scoped>
 .about-us img {
-  width: 90%;
-  min-width: 380px;
+  width: 100%;
+  min-width: 250px;
 }
 </style>
