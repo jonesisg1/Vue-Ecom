@@ -7,7 +7,7 @@
       <!-- {{ grid.bikes }} -->
       <div class="products-grid-container">
         <ProductsBikeCard ref="card" class="mx-2" :bikes="slicedBikes"></ProductsBikeCard>
-        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += 10" class="mt-3 mx-2" />
+        <ProductsMoreButton v-if="slicedBikes.length < grid.bikes.length" @increment-cards="grid.showCards += numCardsToShow" class="mt-3 mx-2" />
         <Notification v-if="slicedBikes.length == 0" class="my-5 ms-3 py-5">
           <h4>Sorry, we can't find any products that match your filters.</h4>
         </Notification>
@@ -21,8 +21,7 @@
 import type { Product, Filters, Bike, BikeFilterState, SizesOptions } from '../types';
 
 const bikeData: Bike[] = useBikeData()
-
-// console.log(bikeData)
+const numCardsToShow = 10
 
 interface grid {
   cards: Product[],
@@ -34,7 +33,7 @@ const store = useMainStore()
 const grid: grid = reactive({
   cards: [],
   bikes: bikeData,
-  showCards: 10,
+  showCards: numCardsToShow,
 })
 
 const filter = ref()
@@ -126,7 +125,7 @@ const doFiltering = (filterList: BikeFilterState) => {
     }
     return match
   })
-  grid.showCards = 10
+  grid.showCards = numCardsToShow
   sortItems(currentSort.value)
 }
 

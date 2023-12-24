@@ -2,7 +2,7 @@
 </script>
 
 <template>
-    <section class="carousel">
+    <section class="carousel px-4 pt-4">
         <div id="heroControls" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#heroControls" data-bs-slide-to="0" class="active" aria-current="true"
